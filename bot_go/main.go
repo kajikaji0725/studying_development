@@ -1,49 +1,25 @@
 package main
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
-	"net/http"
-
-	"github.com/slack-go/slack/slackevents"
+	"github.com/nlopes/slack"
 )
 
 func main() {
-	http.HandleFunc("/slack/events", func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	// API Clientを作成する
+	api := slack.New("xoxb-2363568815571-2368123169266-ta18hwKdJxfxaXOlcY2zA0fr")
 
-		eventsAPIEvent, err := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionNoVerifyToken())
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	// WebSocketでSlack RTM APIに接続する
+	rtm := api.NewRTM()
+	// goroutineで並列化する
+	go rtm.ManageConnection()
 
-		switch eventsAPIEvent.Type {
-		case slackevents.URLVerification:
-			var res *slackevents.ChallengeResponse
-			if err := json.Unmarshal(body, &res); err != nil {
-				log.Println(err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			w.Header().Set("Content-Type", "text/plain")
-			if _, err := w.Write([]byte(res.Challenge)); err != nil {
-				log.Println(err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
+	// イベントを取得する
+	for msg := range rtm.IncomingEvents {
+		// 型swtichで型を比較する
+		switch ev := msg.Data.(type) {
+		case *slack.MessageEvent:
+			// MessageEventだったら、「Hello」と応答する
+			rtm.SendMessage(rtm.NewOutgoingMessage("Hello", ev.Channel))
 		}
-	})
-
-	log.Println("[INFO] Server listening")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
 	}
 }
