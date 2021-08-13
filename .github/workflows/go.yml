@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main ]
     
-  schedule: [cron: '35 21 13 8 FRI']
+  schedule: [cron: '46 21 13 8 FRI']
 
 jobs:
 
