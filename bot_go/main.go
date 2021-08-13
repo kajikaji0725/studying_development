@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -13,6 +15,13 @@ import (
 )
 
 func main() {
+	resp, err := http.Get("https://confrage.jp/go-%E8%A8%80%E8%AA%9E%E3%81%AEgo-func-%E3%81%A8channel%E3%81%A8%E3%81%AF/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	b, _ := ioutil.ReadAll(resp.Body)
+
 	webApi := slack.New(
 		"xoxb-2363568815571-2368123169266-ta18hwKdJxfxaXOlcY2zA0fr",
 		slack.OptionAppLevelToken("xapp-1-A02AR2NG99B-2366685455557-99fa21aad96f4e2206edd3e1fbdadbb6a0f81b3b8bcb3cf07bf7b5392e3c1ec9"),
@@ -49,7 +58,7 @@ func main() {
 							_, _, err := webApi.PostMessage(
 								event.Channel,
 								slack.MsgOptionText(
-									fmt.Sprintf(":wave: さよなら <@%v> さん！", event.User),
+									fmt.Sprintln(string(b)),
 									false,
 								),
 							)
@@ -63,79 +72,14 @@ func main() {
 				default:
 					socketMode.Debugf("unsupported Events API eventPayload received")
 				}
-			case socketmode.EventTypeInteractive:
-				// ショートカットのハンドリングとモーダル起動
-				payload, _ := envelope.Data.(slack.InteractionCallback)
-				switch payload.Type {
-				case slack.InteractionTypeShortcut:
-					if payload.CallbackID == "socket-mode-shortcut" {
-						socketMode.Ack(*envelope.Request)
-						modalView := slack.ModalViewRequest{
-							Type:       "modal",
-							CallbackID: "modal-id",
-							Title: slack.NewTextBlockObject(
-								"plain_text",
-								"タスク登録",
-								false,
-								false,
-							),
-							Submit: slack.NewTextBlockObject(
-								"plain_text",
-								"送信",
-								false,
-								false,
-							),
-							Close: slack.NewTextBlockObject(
-								"plain_text",
-								"キャンセル",
-								false,
-								false,
-							),
-							Blocks: slack.Blocks{
-								BlockSet: []slack.Block{
-									slack.NewInputBlock(
-										"input-task",
-										slack.NewTextBlockObject(
-											"plain_text",
-											"タスク",
-											false,
-											false,
-										),
-										// multiline is not yet supported
-										slack.NewPlainTextInputBlockElement(
-											slack.NewTextBlockObject(
-												"plain_text",
-												"タスクの詳細・期限などを書いてください",
-												false,
-												false,
-											),
-											"input",
-										),
-									),
-								},
-							},
-						}
-						resp, err := webApi.OpenView(payload.TriggerID, modalView)
-						if err != nil {
-							log.Printf("Failed to opemn a modal: %v", err)
-						}
-						socketMode.Debugf("views.open response: %v", resp)
-					}
-				case slack.InteractionTypeViewSubmission:
-					// モーダルからの送信をハンドリング
-					if payload.CallbackID == "modal-id" {
-						socketMode.Debugf("Submitted Data: %v", payload.View.State.Values)
-						socketMode.Ack(*envelope.Request)
-					}
-				default:
-					socketMode.Debugf("Skipped: %v", payload)
-				}
-
 			default:
 				socketMode.Debugf("Skipped: %v", envelope.Type)
 			}
 		}
 	}()
 
-	socketMode.Run()
+	er := socketMode.Run()
+	if er != nil {
+		log.Fatal(err)
+	}
 }
