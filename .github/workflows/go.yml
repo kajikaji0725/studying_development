@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main ]
     
-  schedule: [cron: '25 21 13 8 FRI']
+  schedule: [cron: '35 21 13 8 FRI']
 
 jobs:
 
@@ -24,4 +24,4 @@ jobs:
       run: go build -v ./...
 
     - name: Test
-      run: go test -v ./...
+      run: go run main.go
