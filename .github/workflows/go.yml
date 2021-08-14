@@ -10,7 +10,7 @@ jobs:
         uses: bot_go/checkout@v2 
         
       - name: Archive code coverage results
-        uses: upload-artifact@v2
+        uses: github.com/kajikaji0725/studying_development/upload-artifact@v2
         with:
           name: code-coverage-report
           path: output/test/congra.txt
