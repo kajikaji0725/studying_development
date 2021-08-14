@@ -9,3 +9,5 @@ func main() {
 		slack.MsgOptionText("情報セキュリティはやりましたか？モデリングもやりましたか？　のみ", false),
 	)
 }
+
+//hogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehogehoge
