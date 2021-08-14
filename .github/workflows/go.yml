@@ -1,17 +1,16 @@
-name: Greeting from Mona
+name: Node CI
 
-on: push
+on: [push]
 
 jobs:
-  my-job:
-    name: My Job
+  build_and_test:
     runs-on: ubuntu-latest
     steps:
-      - name: Print a greeting
-        env:
-          MY_VAR: Hi there! My name is
-          FIRST_NAME: Mona
-          MIDDLE_NAME: The
-          LAST_NAME: Octocat
-        run: |
-          echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
+      - name: Checkout repository
+        uses: bot_go/checkout@v2 
+        
+      - name: Archive code coverage results
+        uses: upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: output/test/congra.txt
