@@ -13,6 +13,5 @@ jobs:
     steps:
       - name: Create dot env file
       - shell: bash
-        run: |
-          touch .env
+        run:
           echo "name=${{ secrets.name }}" >> .env
