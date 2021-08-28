@@ -11,7 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Create dot env file
-      - shell: bash
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: env
         run:
           echo "name=${{ secrets.name }}" >> .env
