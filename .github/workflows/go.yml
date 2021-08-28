@@ -17,3 +17,4 @@ jobs:
         run:
           touch .env
           echo "name=${{ secrets.name }}" >> .env
+          echo "nanana=${{ fuck }}" >> .env
