@@ -15,4 +15,5 @@ jobs:
         uses: actions/checkout@v2
       - name: env
         run:
+          touch .env
           echo "name=${{ secrets.name }}" >> .env
