@@ -1,16 +1,20 @@
-name: Node CI
+name: Go
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build_and_test:
+
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2 
-        
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v2
-        with:
-          name: code-coverage-report
-          path: bot_go/congra.txt
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: env
+        run:
+          touch .env
+          echo "name=${{ secrets.name }}" >> .env
+          echo "nanana=fuck" >> .env
